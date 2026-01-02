@@ -1,5 +1,5 @@
-import {DataTypes} from 'sequelize';
-import {sequelize} from '../database/postgress.js';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../database/postgress.js';
 
 const Course = sequelize.define('Course', {
   id: {
@@ -19,6 +19,11 @@ const Course = sequelize.define('Course', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 1
+  },
+  code: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
   },
   class: {
     type: DataTypes.STRING,

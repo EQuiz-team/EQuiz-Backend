@@ -12,6 +12,10 @@ const Question = sequelize.define('Question', {
     type: DataTypes.TEXT,
     allowNull: false
   },
+  value: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   options: {
     type: DataTypes.ARRAY(DataTypes.TEXT),
     allowNull: false
@@ -51,7 +55,7 @@ const Question = sequelize.define('Question', {
   }
   
 }, {
-  tableName: 'questions',
+  tableName: 'question',
   timestamps: true
 });
 
