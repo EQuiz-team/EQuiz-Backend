@@ -1,35 +1,83 @@
+// models/student.model.js
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/postgress.js";
-import User from "./user.model.js";
-import Course from "./course.model.js";
 
-const Student = sequelize.define('studentCourse', {
+const Student = sequelize.define('Student', {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
+    userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        unique: true,
+        field: 'user_id',
+        references: {
+            model: 'users',
+            key: 'id'
+        },
+        onDelete: 'CASCADE'
     },
     studentId: {
         type: DataTypes.STRING,
-        ref: User.teacher_id,
-        allownull: true,
-        field: teacher_id
+        allowNull: false,
+        unique: true,
+        field: 'student_id'
     },
-    courseId: {
+    department: {
         type: DataTypes.STRING,
-        ref: Course.code,
-        allownull: false,
-        field: course_id
-    }
-    level: {
-        type: DataTypes.STRING,
-        allownull: false,
+        allowNull: true
+    },
+    enrollmentYear: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'enrollment_year'
+    },
+    gpa: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0.0,
         validate: {
-            User.level === Course.level
+            min: 0,
+            max: 4.0
         }
+    },
+    creditsCompleted: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        field: 'credits_completed'
+    },
+    status: {
+        type: DataTypes.ENUM('active', 'graduated', 'suspended', 'withdrawn'),
+        defaultValue: 'active'
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: 'created_at'
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: 'updated_at'
     }
 }, {
-    tablename: "studentcourse"
-    timestamp: true,
-} )
+    tableName: 'students',
+    timestamps: true,
+    indexes: [
+        {
+            fields: ['user_id']
+        },
+        {
+            fields: ['student_id']
+        },
+        {
+            fields: ['department']
+        },
+        {
+            fields: ['status']
+        }
+    ]
+});
+
+export default Student;

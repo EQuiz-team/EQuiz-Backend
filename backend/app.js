@@ -4,24 +4,36 @@ import cookieParser from 'cookie-parser';
 import { PORT, NODE_ENV } from './config/env.js';
 import authRouter from './routes/auth.routes.js';
 import userRouter from './routes/user.routes.js';
-import questRouter from './routes/question.routes.js';
+import courseRoutes from './routes/course.routes.js';
 import connectionToDatabase from './database/postgress.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import arcjetMiddleware from './middlewares/arcjet.middleware.js';
+import quizRoutes from './routes/course.routes.js';
+import questionRoutes from './routes/question.routes.js';
+import classRoutes from './routes/class.routes.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(arcjetMiddleware);
+//app.use(arcjetMiddleware);
 
 // Use the imported routers
+app.use('/api/v1/class', classRoutes);
+app.use('/api/v1/quiz', quizRoutes);
+app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/questions', questRouter);
+app.use('/api/v1/questions', questionRoutes);
 
 app.use(errorMiddleware);
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
 
 // Basic route for testing
 

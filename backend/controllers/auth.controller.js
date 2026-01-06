@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/env.js';
+import { v4 as uuidv4 } from 'uuid'; // Add this import at top
 
 export const signUp = async (req, res, next) => {
   const transaction = await sequelize.transaction();
@@ -96,7 +97,7 @@ export const signUp = async (req, res, next) => {
     }
 
     // Validate role
-    const validRoles = ['user', 'admin'];
+    const validRoles = ['user', 'student', 'teacher', 'admin'];
     if (!validRoles.includes(role)) {
       await transaction.rollback();
       return res.status(400).json({ 
@@ -107,6 +108,24 @@ export const signUp = async (req, res, next) => {
       });
     }
 
+    // In signUp function:
+    let studentId = null;
+    let teacherId = null;
+    let adminId = null;
+
+    if (role === 'student') {
+      // Generate UUID instead of string
+      studentId = uuidv4();
+      // Or keep count but prefix with UUID
+      //const studentCount = await User.count({ where: { role: 'student' } });
+      //studentId = `${uuidv4().substring(0, 8)}-STU${String(studentCount + 1).padStart(3, '0')}`;
+
+    } else if (role === 'teacher') {
+      teacherId = uuidv4();
+    } else if (role === 'admin') {
+      adminId = uuidv4();
+    }
+    
     // Check if user exists
     const existingUser = await User.findOne({ 
       where: { email: trimmedEmail },
@@ -131,7 +150,11 @@ export const signUp = async (req, res, next) => {
       name: trimmedName, 
       email: trimmedEmail, 
       password: hashedPassword, 
-      role 
+      role,
+      studentId,    // Add this
+      teacherId,    // Add this
+      adminId,      // Add this
+      isActive: true
     }, { transaction });
 
     // Create JWT token
@@ -263,7 +286,21 @@ export const signIn = async (req, res, next) => {
       passwordLength: user.password ? user.password.length : 0
     } : 'No user found');
     
+    console.log('6. User found:', user ? 'YES' : 'NO');
+    if (user) {
+      console.log('7. User details:', {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        passwordExists: !!user.password,
+        passwordLength: user.password ? user.password.length : 0,
+        passwordFirst10: user.password ? user.password.substring(0, 10) + '...' : 'null'
+      });
+    }
+
     if (!user) {
+      console.log('8. User not found - returning 401');
       await transaction.rollback();
       return res.status(401).json({ 
         success: false,
@@ -278,7 +315,7 @@ export const signIn = async (req, res, next) => {
       await transaction.rollback();
       return res.status(401).json({ 
         success: false,
-        message: 'Invalid email or password' 
+        message: 'Invalid email or password bcrypt bastard'
       });
     }
 

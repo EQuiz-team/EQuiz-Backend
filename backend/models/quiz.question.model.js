@@ -3,19 +3,20 @@ import { sequelize } from '../database/postgress.js';
 
 const QuizQuestion = sequelize.define('QuizQuestion', {
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4
     primaryKey: true,
     autoIncrement: true
   },
     quizId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
     ref: 'Quiz',
     key: 'id',
     field: 'quiz_id',
     allowNull: false
   },
     questionId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
     ref: 'Question',
     key: 'id',
     field: 'question_id',

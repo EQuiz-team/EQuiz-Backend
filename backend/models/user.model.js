@@ -5,9 +5,9 @@ import bcrypt from 'bcryptjs';
 
 const User = sequelize.define('User', {
   id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
   },
   name: {  // Changed from username to name
     type: DataTypes.STRING,
@@ -46,7 +46,7 @@ const User = sequelize.define('User', {
     }
   },
   studentId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: true,
     validate: {
       isStudentIdRequired(value) {
@@ -61,7 +61,7 @@ const User = sequelize.define('User', {
     field: 'student_id'
   },
   teacherId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: true,
     validate: {
       isTeacherIdRequired(value) {
@@ -76,7 +76,7 @@ const User = sequelize.define('User', {
     field: 'teacher_id'
   },
   adminId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: true,
     validate: {
       isAdminIdRequired(value) {

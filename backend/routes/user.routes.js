@@ -11,7 +11,7 @@ userRouter.get('/', authorizeAdmin, getAllUsers);
 
 userRouter.get('/:id', authorise, getUserById);
 
-userRouter.post('/', authorizeAdmin, createUser);
+userRouter.post('/signup', createUser);
 
 userRouter.put('/:id', authorise, updateUser);
 

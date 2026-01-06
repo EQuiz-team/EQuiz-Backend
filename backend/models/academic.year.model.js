@@ -3,9 +3,9 @@ import { sequelize } from '../database/postgress.js';
 
 const AcademicYear = sequelize.define('AcademicYear', {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+        primaryKey: true
     },
     year: {
         type: DataTypes.STRING,

@@ -1,62 +1,133 @@
-// models/question.model.js
+// models/Question.model.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/postgress.js';
 
 const Question = sequelize.define('Question', {
   id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
   },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  value: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  options: {
-    type: DataTypes.ARRAY(DataTypes.TEXT),
-    allowNull: false
-  },
-  courseId: {
-    type: DataTypes.INTEGER,
-    ref: 'Courses',
-    key: 'id',
-    field: 'course_id',
-    allowNull: false
-  },
-  teacherId: {
-    type: DataTypes.INTEGER,
-    ref: 'Users',
-    key: 'id',
-    field: 'teacher_id',
-    allowNull: false
-  },
-  testId: {
-    type: DataTypes.INTEGER,
-    ref: 'Tests',
-    key: 'id',
-    field: 'test_id',
-    allowNull: false
-  },
-  correctAnswer: {
-    type: DataTypes.STRING,
-    allowNull: function() {
-      return this.questionType !== 'multichoice';
-    },
-    field: 'correct_answer' // Maps to snake_case column
-  },
-  questionType: {
-    type: DataTypes.ENUM('single_choice', 'multichoice', 'open_ended'),
-    defaultValue: 'single_choice',
-    field: 'question_type'
-  }
   
+  // Basic question info
+  questionText: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
+  },
+  
+  // Question type configuration
+  questionType: {
+    type: DataTypes.ENUM('multiple-choice', 'true-false', 'short-answer', 'essay'),
+    allowNull: false,
+    defaultValue: 'multiple-choice'
+  },
+  
+  // Multiple choice specific
+  multipleCorrect: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  
+  // True/False specific
+  correctBoolean: {
+    type: DataTypes.BOOLEAN
+  },
+  
+  // Short answer specific
+  correctAnswer: {
+    type: DataTypes.TEXT
+  },
+  sampleAnswer: {
+    type: DataTypes.TEXT
+  },
+  
+  // Essay specific
+  maxLength: {
+    type: DataTypes.INTEGER,
+    validate: {
+      min: 0
+    }
+  },
+  
+  // Course and difficulty
+  course: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: 'courses',
+      key: 'code'
+    },
+    validate: {
+      notEmpty: true
+    }
+  },
+  difficulty: {
+    type: DataTypes.ENUM('easy', 'medium', 'hard'),
+    allowNull: false,
+    defaultValue: 'medium'
+  },
+  points: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 10,
+    validate: {
+      min: 0
+    }
+  },
+  
+  // Additional information
+  topic: {
+    type: DataTypes.STRING
+  },
+  explanation: {
+    type: DataTypes.TEXT
+  },
+  
+  // Template functionality
+  isTemplate: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  templateName: {
+    type: DataTypes.STRING
+  },
+  templateDescription: {
+    type: DataTypes.TEXT
+  },
+  
+  // Metadata
+  createdBy: {
+    type: DataTypes.UUID,
+    allowNull: false
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  }
 }, {
-  tableName: 'question',
-  timestamps: true
+  tableName: 'questions',
+  timestamps: true,
+  underscored: true,
+  indexes: [
+    {
+      fields: ['course', 'question_type']
+    },
+    {
+      fields: ['difficulty']
+    },
+    {
+      fields: ['is_template']
+    },
+    {
+      fields: ['created_by']
+    },
+    {
+      fields: ['is_active']
+    }
+  ]
 });
 
 export default Question;
